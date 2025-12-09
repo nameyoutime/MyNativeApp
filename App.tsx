@@ -13,13 +13,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { AppNavigator } from './src/navigation/AppNavigator';
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
   return (
     <QueryProvider>
       <ReduxProvider>
         <SafeAreaProvider>
-          <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+          <StatusBar barStyle="dark-content" />
           <NavigationContainer>
             <AppNavigator />
           </NavigationContainer>

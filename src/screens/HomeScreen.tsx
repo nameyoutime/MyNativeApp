@@ -8,6 +8,10 @@ import {
   StyleSheet,
   ActivityIndicator,
   Image,
+  LayoutAnimation,
+  Platform,
+  UIManager,
+  ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -22,8 +26,24 @@ import {
 import { fetchMovies } from '../api/tmdb';
 import { Movie, MovieResponse } from '../types/movie';
 import { useQuery } from '@tanstack/react-query';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+import { useInfiniteQuery } from '@tanstack/react-query';
+
+// ... (other imports remain the same, but remove useQuery if not used or keep both if needed, but we replace usage)
+// I will keep the imports clean in the actual replacement block.
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'MainTabs'>;
+
+const TMDB_LOGO_URL = 'https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg'; 
+const TMDB_LOGO_PNG = 'https://image.tmdb.org/t/p/w500/wwemzKWzjKYJFfCeiB57q3r4Bcm.png'; 
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -32,6 +52,10 @@ const HomeScreen = () => {
 
   const [searchKeyword, setSearchKeyword] = useState('');
   const [activeSearchQuery, setActiveSearchQuery] = useState('');
+  
+  // Accordion States
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
 
   // Sorting Logic
   const sortMovies = useCallback((list: Movie[]) => {
@@ -50,21 +74,30 @@ const HomeScreen = () => {
     return sorted;
   }, [sortBy]);
 
-  const { data: movies = [], isLoading: loading, error } = useQuery<MovieResponse, Error, Movie[]>({
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: loading,
+  } = useInfiniteQuery<MovieResponse, Error>({
     queryKey: ['movies', category, activeSearchQuery],
-    queryFn: () => fetchMovies(category, activeSearchQuery),
-    select: (data) => sortMovies(data.results),
+    queryFn: ({ pageParam = 1 }) => fetchMovies(category, activeSearchQuery, pageParam as number),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.total_pages) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
   });
 
-  // When category changes, we might want to clear the search? 
-  // For now, let's keep it simple. If user changes category, we persist the search query implies searching in that category?
-  // But our API implementation prioritizes search query over category if query exists.
-  // So if activeSearchQuery is set, category is effectively ignored by the API (except maybe for tracking).
-  // The user requirement says: "trigger an API call to search for the list of movies with the specified category and search keyword."
-  // TMDB Search API doesn't strictly support filtering by "Upcoming" + "Keyword". It searches global database.
-  // So my implementation in tmdb.ts matches this limitation (prioritizes active search).
-  
-  // If user changes category, they probably expect to see that category's movies, so we should clear active search.
+  const movies = React.useMemo(() => {
+    if (!data) return [];
+    const allMovies = data.pages.flatMap((page) => page.results);
+    return sortMovies(allMovies);
+  }, [data, sortMovies]);
+
   useEffect(() => {
     setActiveSearchQuery('');
     setSearchKeyword('');
@@ -74,18 +107,43 @@ const HomeScreen = () => {
     setActiveSearchQuery(searchKeyword);
   };
   
+  const toggleCategory = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setCategoryOpen(!categoryOpen);
+    setSortOpen(false); // Close others
+  };
+
+  const toggleSort = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setSortOpen(!sortOpen);
+    setCategoryOpen(false); // Close others
+  };
+
+  const categoryLabels: Record<MovieCategory, string> = {
+    now_playing: 'Now Playing',
+    upcoming: 'Upcoming',
+    popular: 'Popular',
+  };
+
+  const sortLabels: Record<SortOption, string> = {
+      release_date: 'Release Date',
+      rating: 'Rating',
+      alphabetical: 'Alphabetical'
+  }
+
   const renderMovie = ({ item }: { item: Movie }) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => navigation.navigate('Details', { movie: item })}
+      activeOpacity={0.7}
     >
       <Image
         source={{ uri: `https://image.tmdb.org/t/p/w200${item.poster_path}` }}
         style={styles.poster}
-        borderRadius={8}
+        borderRadius={4}
       />
       <View style={styles.cardContent}>
-        <Text style={styles.movieTitle} numberOfLines={2}>{item.title}</Text>
+        <Text style={styles.movieTitle} numberOfLines={1}>{item.title}</Text>
         <Text style={styles.movieDate}>{item.release_date}</Text>
         <Text style={styles.movieOverview} numberOfLines={3}>
           {item.overview}
@@ -94,184 +152,317 @@ const HomeScreen = () => {
     </TouchableOpacity>
   );
 
+  const renderFooter = () => {
+    if (!hasNextPage) return <View style={{ height: 20 }} />;
+    
+    return (
+      <View style={styles.footer}>
+        {isFetchingNextPage ? (
+           <ActivityIndicator size="small" color="#01b4e4" />
+        ) : (
+          <TouchableOpacity style={styles.loadMoreButton} onPress={() => fetchNextPage()}>
+            <Text style={styles.loadMoreText}>Load More</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  };
+
   return (
-    <View style={styles.container}>
-        
-      <View style={styles.header}>
-          
-        {/* Category Selector */}
-        <Text style={styles.label}>Category</Text>
-        <View style={styles.pillContainer}>
-          {(['now_playing', 'upcoming', 'popular'] as MovieCategory[]).map((cat) => (
-            <TouchableOpacity
-              key={cat}
-              style={[styles.pill, category === cat && styles.pillActive]}
-              onPress={() => dispatch(setCategory(cat))}
-            >
-              <Text style={[styles.pillText, category === cat && styles.pillTextActive]}>
-                {cat.replace('_', ' ').toUpperCase()}
-              </Text>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.logoContainer}>
+         <View style={styles.brandContainer}>
+             <Text style={styles.brandTextTop}>THE</Text>
+             <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                 <Text style={styles.brandTextMiddle}>MOVIE</Text>
+                 <View style={styles.brandPill} />
+             </View>
+             <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <View style={[styles.brandPill, { width: 20, marginRight: 2, backgroundColor: '#90cea1' }]} />
+                <Text style={styles.brandTextBottom}>DB</Text>
+             </View>
+         </View>
+      </View>
+
+      <View style={styles.controls}>
+        {/* Category Dropdown */}
+        <View style={styles.dropdownContainer}>
+            <TouchableOpacity style={styles.dropdownHeader} onPress={toggleCategory}>
+                <Text style={styles.dropdownLabel}>{categoryLabels[category]}</Text>
+                <Text style={styles.chevron}>{categoryOpen ? '▲' : '▼'}</Text>
             </TouchableOpacity>
-          ))}
+            {categoryOpen && (
+                <View style={styles.dropdownList}>
+                    {(['now_playing', 'upcoming', 'popular'] as MovieCategory[]).map((cat) => (
+                        <TouchableOpacity 
+                            key={cat} 
+                            style={[styles.dropdownItem, category === cat && styles.dropdownItemActive]}
+                            onPress={() => {
+                                dispatch(setCategory(cat));
+                                toggleCategory();
+                            }}
+                        >
+                            <Text style={[styles.dropdownItemText, category === cat && styles.dropdownItemTextActive]}>
+                                {categoryLabels[cat]}
+                            </Text>
+                            {category === cat && <Text style={{color: 'white', fontWeight: 'bold'}}>✓</Text>}
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            )}
         </View>
 
-        {/* Sort Selector */}
-        <Text style={styles.label}>Sort By</Text>
-        <View style={styles.pillContainer}>
-           {(['alphabetical', 'rating', 'release_date'] as SortOption[]).map((opt) => (
-             <TouchableOpacity
-                key={opt}
-                style={[styles.pill, styles.pillSmall, sortBy === opt && styles.pillActive]}
-                onPress={() => dispatch(setSortBy(opt))}
-             >
-                <Text style={[styles.pillText, sortBy === opt && styles.pillTextActive]}>
-                    {opt.replace('_', ' ').replace('by', '')}
-                </Text>
-             </TouchableOpacity>
-           ))}
+        {/* Sort Dropdown */}
+        <View style={styles.dropdownContainer}>
+            <TouchableOpacity style={styles.dropdownHeader} onPress={toggleSort}>
+                <Text style={styles.dropdownLabel}>Sort by {sortLabels[sortBy]}</Text>
+                 <Text style={styles.chevron}>{sortOpen ? '▲' : '▼'}</Text>
+            </TouchableOpacity>
+             {sortOpen && (
+                <View style={styles.dropdownList}>
+                    {(['release_date', 'rating', 'alphabetical'] as SortOption[]).map((opt) => (
+                        <TouchableOpacity 
+                            key={opt} 
+                            style={[styles.dropdownItem, sortBy === opt && styles.dropdownItemActive]}
+                            onPress={() => {
+                                dispatch(setSortBy(opt));
+                                toggleSort();
+                            }}
+                        >
+                            <Text style={[styles.dropdownItemText, sortBy === opt && styles.dropdownItemTextActive]}>
+                                {sortLabels[opt]}
+                            </Text>
+                             {sortBy === opt && <Text style={{color: 'white', fontWeight: 'bold'}}>✓</Text>}
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            )}
         </View>
 
-        {/* Search Field */}
+        {/* Search */}
         <TextInput
           style={styles.input}
-          placeholder="Search movies..."
-          placeholderTextColor="#666"
+          placeholder="Search..."
+          placeholderTextColor="#999"
           value={searchKeyword}
           onChangeText={setSearchKeyword}
           onSubmitEditing={handleSearchPress}
           returnKeyType="search"
         />
 
-        {/* Search Button */}
         <TouchableOpacity style={styles.searchButton} onPress={handleSearchPress}>
           <Text style={styles.searchButtonText}>Search</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Movie List */}
-      {loading ? (
-        <ActivityIndicator size="large" color="#E50914" style={{ marginTop: 20 }} />
-      ) : (
-        <FlatList
-          data={movies}
-          renderItem={renderMovie}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.listContent}
-          inverted={false}
-          ListEmptyComponent={
-            <Text style={{ color: '#fff', textAlign: 'center', marginTop: 20 }}>
-              No movies found.
-            </Text>
-          }
-        />
-      )}
-    </View>
+      {/* List */}
+      <View style={styles.listContainer}>
+        {loading ? (
+            <ActivityIndicator size="large" color="#01b4e4" style={{ marginTop: 20 }} />
+        ) : (
+            <FlatList
+            data={movies}
+            renderItem={renderMovie}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={{height: 12}} />}
+            ListEmptyComponent={
+                <Text style={{ textAlign: 'center', marginTop: 20, color: '#666' }}>
+                No movies found.
+                </Text>
+            }
+            ListFooterComponent={renderFooter}
+            />
+        )}
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#fff',
   },
-  header: {
-    padding: 16,
-    backgroundColor: '#1a1a1a',
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
+  logoContainer: {
+    alignItems: 'center',
+    paddingVertical: 10,
+    marginTop: 10, // status bar
   },
-  label: {
-      color: '#fff',
-      fontSize: 12,
+  brandContainer: {
+      alignItems: 'flex-end',
+  },
+  brandTextTop: {
+      color: '#01b4e4',
       fontWeight: 'bold',
-      marginBottom: 8,
-      marginTop: 4,
+      fontSize: 14,
+      lineHeight: 14,
+      marginRight: 60,
   },
-  pillContainer: {
-    flexDirection: 'row',
-    marginBottom: 12,
-    flexWrap: 'wrap',
+  brandTextMiddle: {
+      color: '#01b4e4',
+      fontWeight: '900',
+      fontSize: 22,
+      lineHeight: 22,
   },
-  pill: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    backgroundColor: '#333',
-    marginRight: 8,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#444',
+  brandPill: {
+      width: 30,
+      height: 10,
+      backgroundColor: '#01b4e4',
+      borderRadius: 10,
+      marginLeft: 4,
   },
-  pillSmall: {
-      paddingHorizontal: 10,
-      paddingVertical: 4,
+  brandTextBottom: {
+      color: '#01b4e4',
+      fontWeight: '900',
+      fontSize: 22,
+      lineHeight: 22,
   },
-  pillActive: {
-    backgroundColor: '#E50914',
-    borderColor: '#E50914',
+  controls: {
+      paddingHorizontal: 20,
+      paddingBottom: 20,
+      zIndex: 10, // Ensure dropdowns float above if absolute positioned (though here handled via layout flows)
   },
-  pillText: {
-    color: '#ccc',
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'capitalize',
+  dropdownContainer: {
+      marginBottom: 12,
+      backgroundColor: '#fff',
+      borderRadius: 4,
+      // Shadow for dropdown container
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 2,
+      borderWidth: 1,
+      borderColor: '#eee',
   },
-  pillTextActive: {
-    color: '#fff',
+  dropdownHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 14,
+      backgroundColor: '#fff',
+      borderRadius: 4,
+  },
+  dropdownLabel: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: '#333',
+  },
+  chevron: {
+      fontSize: 12,
+      color: '#333',
+  },
+  dropdownList: {
+      backgroundColor: '#f8f9fa',
+      borderTopWidth: 1,
+      borderTopColor: '#eee',
+  },
+  dropdownItem: {
+      padding: 14,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+  },
+  dropdownItemActive: {
+      backgroundColor: '#01b4e4',
+  },
+  dropdownItemText: {
+      fontSize: 15,
+      color: '#333',
+  },
+  dropdownItemTextActive: {
+      color: '#fff',
+      fontWeight: '600',
   },
   input: {
-    backgroundColor: '#333',
-    color: '#fff',
-    borderRadius: 8,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
     padding: 12,
     fontSize: 16,
-    marginBottom: 12,
+    marginBottom: 16,
+    color: '#333',
+    // Slight shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   searchButton: {
-    backgroundColor: '#E50914',
-    borderRadius: 8,
-    padding: 14,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 25, // Pill shape
+    paddingVertical: 14,
     alignItems: 'center',
   },
   searchButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: '#666',
+    fontWeight: '600',
     fontSize: 16,
   },
+  listContainer: {
+      flex: 1,
+      backgroundColor: '#f5f5f5', // Slightly darker list bg
+  },
   listContent: {
-    padding: 16,
+    padding: 20,
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: '#1c1c1c',
-    borderRadius: 12,
-    marginBottom: 16,
+    backgroundColor: '#fff',
+    borderRadius: 8,
     overflow: 'hidden',
+    // Card Shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    height: 160,
   },
   poster: {
-    width: 100,
-    height: 150,
+    width: 106, // approx ~200/3 * 0.something, fitting aspect ratio
+    height: '100%',
+    backgroundColor: '#ddd',
   },
   cardContent: {
     flex: 1,
-    padding: 12,
-    justifyContent: 'center',
+    padding: 14,
+    justifyContent: 'flex-start',
   },
   movieTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#000',
     marginBottom: 4,
   },
   movieDate: {
-    fontSize: 14,
-    color: '#aaa',
-    marginBottom: 8,
+    fontSize: 12,
+    color: '#999',
+    marginBottom: 12,
   },
   movieOverview: {
     fontSize: 13,
-    color: '#ccc',
+    color: '#333',
     lineHeight: 18,
+  },
+  footer: {
+    paddingVertical: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadMoreButton: {
+    backgroundColor: '#01b4e4',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  loadMoreText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

@@ -16,11 +16,11 @@ const MainTabs = () => {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#000',
-          borderTopColor: '#333',
+          backgroundColor: '#fff',
+          borderTopColor: '#e0e0e0',
         },
-        tabBarActiveTintColor: '#E50914',
-        tabBarInactiveTintColor: '#888',
+        tabBarActiveTintColor: '#0D253F',
+        tabBarInactiveTintColor: '#999',
         tabBarIcon: ({ color, size }) => {
             let icon = '🏠';
             if (route.name === 'Watchlist') icon = '🔖';
@@ -39,14 +39,14 @@ export const AppNavigator = () => {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#000',
+          backgroundColor: '#fff',
         },
-        headerTintColor: '#fff',
+        headerTintColor: '#000',
         headerTitleStyle: {
           fontWeight: 'bold',
         },
         contentStyle: {
-            backgroundColor: '#000'
+            backgroundColor: '#fff'
         }
       }}
     >

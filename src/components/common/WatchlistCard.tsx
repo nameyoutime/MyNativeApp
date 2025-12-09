@@ -25,7 +25,7 @@ const WatchlistCard = ({ movie, onPress, onRemove }: WatchlistCardProps) => {
       activeOpacity={0.8}
     >
       <Image
-        source={{ uri: `${ENV.TMDB_IMAGE_BASE_URL}${movie.poster_path}` }}
+        source={{ uri: `${ENV.TMDB_IMAGE_BASE_URL}w200${movie.poster_path}` }}
         style={styles.poster}
         resizeMode="cover"
       />

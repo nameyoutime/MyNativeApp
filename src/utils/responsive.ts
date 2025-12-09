@@ -5,7 +5,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 // Guideline sizes are based on standard ~5" screen mobile device
 // (e.g. iPhone 11 Pro is 375 x 812)
 const GUIDELINE_BASE_WIDTH = 375;
-const GUIDELINE_BASE_HEIGHT = 812;
+// const GUIDELINE_BASE_HEIGHT = 812;
 
 /**
  * Calculates a font size that scales with the screen width.

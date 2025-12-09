@@ -1,24 +1,23 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useSelector, useDispatch } from 'react-redux';
-import { Dropdown } from 'react-native-element-dropdown';
 import { useNavigation } from '@react-navigation/native';
-import { RootState } from '../redux/store';
-import { removeFromWatchlist } from '../redux/slices/watchlistSlice';
-import { Movie } from '../types/movie';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  FlatList,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useDispatch, useSelector } from 'react-redux';
 import { fetchAccountDetails } from '../api/tmdb';
 import ChevronLeftIcon from '../assets/icons/ChevronLeftIcon';
 import AppLogo from '../components/AppLogo';
-import { watchlistStyles as styles } from '../styles/watchlistStyles';
-import WatchlistCard from '../components/common/WatchlistCard';
 import EmptyState from '../components/common/EmptyState';
-import ErrorMessage from '../components/common/ErrorMessage';
+import WatchlistCard from '../components/common/WatchlistCard';
+import { removeFromWatchlist } from '../redux/slices/watchlistSlice';
+import { RootState } from '../redux/store';
+import { watchlistStyles as styles } from '../styles/watchlistStyles';
+import { Movie } from '../types/movie';
 
 // Mock types since we might not get full account details cleanly without logic
 interface UserAccount {
@@ -41,24 +40,20 @@ const WatchlistScreen = () => {
   const dispatch = useDispatch();
   const watchlist = useSelector((state: RootState) => state.watchlist.items);
   const [user, setUser] = useState<UserAccount | null>(null);
-  const [loadingUser, setLoadingUser] = useState(false);
   const [userError, setUserError] = useState<string | null>(null);
 
   const [sortOption, setSortOption] = useState<SortOption>('rating');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   const loadUser = async () => {
-    setLoadingUser(true);
     setUserError(null);
     try {
       const data = await fetchAccountDetails();
       if (data) {
         setUser(data);
       }
-    } catch (e) {
+    } catch {
       setUserError("Failed to load user profile.");
-    } finally {
-      setLoadingUser(false);
     }
   };
 

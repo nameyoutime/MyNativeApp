@@ -5,6 +5,9 @@ import { MovieCategory } from '../redux/slices/settingsSlice';
 
 const api = axios.create({
   baseURL: ENV.TMDB_BASE_URL,
+  headers: {
+    Authorization: `Bearer ${ENV.TMDB_ACCESS_TOKEN}`,
+  },
   params: {
     api_key: ENV.TMDB_ACCESS_TOKEN,
     language: 'en-US',

@@ -5,7 +5,9 @@ import { RootStackParamList, MainTabParamList } from './types';
 import HomeScreen from '../screens/HomeScreen';
 import WatchlistScreen from '../screens/WatchlistScreen';
 import DetailsScreen from '../screens/DetailsScreen';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
+import HomeIcon from '../assets/icons/HomeIcon';
+import WatchListIcon from '../assets/icons/WatchListIcon';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -16,16 +18,23 @@ const MainTabs = () => {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#fff',
+          backgroundColor: '#042541',
           borderTopColor: '#e0e0e0',
         },
-        tabBarActiveTintColor: '#0D253F',
-        tabBarInactiveTintColor: '#999',
+        // remove label text
+        tabBarLabel: () => {
+          return null;
+        },
         tabBarIcon: ({ color, size }) => {
-            let icon = '🏠';
-            if (route.name === 'Watchlist') icon = '🔖';
-            return <Text style={{ fontSize: size }}>{icon}</Text>;
-        }
+          const render = () => {
+            if (route.name === 'Home') {
+              return <HomeIcon />;
+            } else {
+              return <WatchListIcon />;
+            }
+          };
+          return <View style={{marginTop: 18}}>{render()}</View>;
+        },
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
@@ -46,18 +55,18 @@ export const AppNavigator = () => {
           fontWeight: 'bold',
         },
         contentStyle: {
-            backgroundColor: '#fff'
-        }
+          backgroundColor: '#fff',
+        },
       }}
     >
-      <Stack.Screen 
-        name="MainTabs" 
-        component={MainTabs} 
-        options={{ headerShown: false }} 
+      <Stack.Screen
+        name="MainTabs"
+        component={MainTabs}
+        options={{ headerShown: false }}
       />
-      <Stack.Screen 
-        name="Details" 
-        component={DetailsScreen} 
+      <Stack.Screen
+        name="Details"
+        component={DetailsScreen}
         options={{ title: 'Movie Details' }} // Or dynamic title
       />
     </Stack.Navigator>

@@ -11,11 +11,9 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
-  ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import {
   MovieCategory,
@@ -25,7 +23,6 @@ import {
 } from '../redux/slices/settingsSlice';
 import { fetchMovies } from '../api/tmdb';
 import { Movie, MovieResponse } from '../types/movie';
-import { useQuery } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 if (
@@ -39,13 +36,11 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import AppLogo from '../components/AppLogo';
 import ChevronRightIcon from '../assets/icons/ChevronRightIcon';
 import ChevronDownIcon from '../assets/icons/ChevronDownIcon';
-
-// ... (other imports remain the same, but remove useQuery if not used or keep both if needed, but we replace usage)
-// I will keep the imports clean in the actual replacement block.
+import { HomeStackParamList } from '../navigation/types';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'MainTabs'
+  HomeStackParamList,
+  'HomeScreen'
 >;
 
 const HomeScreen = () => {
@@ -64,6 +59,9 @@ const HomeScreen = () => {
   const sortMovies = useCallback(
     (list: Movie[]) => {
       const sorted = [...list];
+      if (sortBy === null) {
+        return sorted; // No sorting
+      }
       switch (sortBy) {
         case 'alphabetical':
           sorted.sort((a, b) => a.title.localeCompare(b.title));
@@ -112,10 +110,14 @@ const HomeScreen = () => {
   useEffect(() => {
     setActiveSearchQuery('');
     setSearchKeyword('');
-  }, [category]);
+    // Reset sort to null when category changes
+    dispatch(setSortBy(null));
+  }, [category, dispatch]);
 
   const handleSearchPress = () => {
     setActiveSearchQuery(searchKeyword);
+    // Reset sort to null when searching
+    dispatch(setSortBy(null));
   };
 
   const toggleCategory = () => {
@@ -136,10 +138,15 @@ const HomeScreen = () => {
     popular: 'Popular',
   };
 
-  const sortLabels: Record<SortOption, string> = {
+  const sortLabels: Record<Exclude<SortOption, null>, string> = {
     release_date: 'Release Date',
     rating: 'Rating',
     alphabetical: 'Alphabetical',
+  };
+
+  const getSortDisplayText = () => {
+    if (sortBy === null) return 'Sort by';
+    return `Sort by ${sortLabels[sortBy]}`;
   };
 
   const renderMovie = ({ item }: { item: Movie }) => (
@@ -232,14 +239,33 @@ const HomeScreen = () => {
         {/* Sort Dropdown */}
         <View style={styles.dropdownContainer}>
           <TouchableOpacity style={styles.dropdownHeader} onPress={toggleSort}>
-            <Text style={styles.dropdownLabel}>
-              Sort by {sortLabels[sortBy]}
-            </Text>
+            <Text style={styles.dropdownLabel}>{getSortDisplayText()}</Text>
             {sortOpen ? <ChevronRightIcon /> : <ChevronDownIcon />}
           </TouchableOpacity>
           {sortOpen && (
             <View style={styles.dropdownList}>
-              {(['release_date', 'rating', 'alphabetical'] as SortOption[]).map(
+              {/* No sorting option */}
+              {/* <TouchableOpacity
+                style={[
+                  styles.dropdownItem,
+                  sortBy === null && styles.dropdownItemActive,
+                ]}
+                onPress={() => {
+                  dispatch(setSortBy(null));
+                  toggleSort();
+                }}
+              >
+                <Text
+                  style={[
+                    styles.dropdownItemText,
+                    sortBy === null && styles.dropdownItemTextActive,
+                  ]}
+                >
+                  Default (No Sorting)
+                </Text>
+              </TouchableOpacity> */}
+              {/* Sort options */}
+              {(Object.keys(sortLabels) as Array<keyof typeof sortLabels>).map(
                 opt => (
                   <TouchableOpacity
                     key={opt}
@@ -329,7 +355,7 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     marginBottom: 15,
-    backgroundColor: '##E3E3E3',
+    backgroundColor: '#fff',
     borderRadius: 4,
     // Shadow for dropdown container
     shadowColor: '#000',
@@ -339,6 +365,7 @@ const styles = StyleSheet.create({
     elevation: 2,
     borderWidth: 1,
     borderColor: '#eee',
+    overflow: 'hidden',
   },
   dropdownHeader: {
     flexDirection: 'row',
@@ -359,22 +386,27 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   dropdownList: {
-    backgroundColor: '#f8f9fa',
-    borderTopWidth: 1,
+    backgroundColor: '#fff',
     borderTopColor: '#eee',
+    borderTopWidth: 1,
+    paddingVertical: 20,
+    paddingHorizontal: 18,
   },
   dropdownItem: {
     padding: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 8,
+    borderRadius: 6,
+    backgroundColor: '#f5f5f5',
   },
   dropdownItemActive: {
-    backgroundColor: '#01b4e4',
+    backgroundColor: '#00B4E4',
   },
   dropdownItemText: {
-    fontSize: 15,
-    color: '#333',
+    fontSize: 14,
+    color: '#000000',
   },
   dropdownItemTextActive: {
     color: '#fff',
@@ -420,6 +452,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 8,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E3E3E3',
     // Card Shadow
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -460,7 +494,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   loadMoreButton: {
-    width:'100%',
+    width: '100%',
     backgroundColor: '#01b4e4',
     paddingHorizontal: 20,
     paddingVertical: 10,

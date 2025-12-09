@@ -5,12 +5,72 @@ import { RootStackParamList, MainTabParamList } from './types';
 import HomeScreen from '../screens/HomeScreen';
 import WatchlistScreen from '../screens/WatchlistScreen';
 import DetailsScreen from '../screens/DetailsScreen';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import HomeIcon from '../assets/icons/HomeIcon';
 import WatchListIcon from '../assets/icons/WatchListIcon';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
+const HomeStack = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#fff',
+        },
+        headerTintColor: '#000',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        contentStyle: {
+          backgroundColor: '#fff',
+        },
+      }}
+    >
+      <Stack.Screen
+        name="HomeScreen"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Details"
+        component={DetailsScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const WatchlistStack = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#fff',
+        },
+        headerTintColor: '#000',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        contentStyle: {
+          backgroundColor: '#fff',
+        },
+      }}
+    >
+      <Stack.Screen
+        name="WatchlistScreen"
+        component={WatchlistScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Details"
+        component={DetailsScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+};
 
 const MainTabs = () => {
   return (
@@ -25,7 +85,7 @@ const MainTabs = () => {
         tabBarLabel: () => {
           return null;
         },
-        tabBarIcon: ({ color, size }) => {
+        tabBarIcon: ({ /* color, size */ }) => {
           const render = () => {
             if (route.name === 'Home') {
               return <HomeIcon />;
@@ -37,8 +97,8 @@ const MainTabs = () => {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Watchlist" component={WatchlistScreen} />
+      <Tab.Screen name="Home" component={HomeStack} />
+      <Tab.Screen name="Watchlist" component={WatchlistStack} />
     </Tab.Navigator>
   );
 };
@@ -62,11 +122,6 @@ export const AppNavigator = () => {
       <Stack.Screen
         name="MainTabs"
         component={MainTabs}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Details"
-        component={DetailsScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

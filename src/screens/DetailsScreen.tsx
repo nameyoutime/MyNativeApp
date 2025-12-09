@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,6 @@ import {
   FlatList,
 } from 'react-native';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../navigation/types';
 import { useQuery } from '@tanstack/react-query';
 import { fetchMovieDetails } from '../api/tmdb';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
@@ -18,19 +17,19 @@ import {
   addToWatchlist,
   removeFromWatchlist,
 } from '../redux/slices/watchlistSlice';
-import ChevronLeftIcon from '../assets/icons/ChevronLeftIcon'; // Assuming you might have one or use text
+import ChevronLeftIcon from '../assets/icons/ChevronLeftIcon';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Movie } from '../types/movie';
-
-type DetailsScreenRouteProp = RouteProp<RootStackParamList, 'Details'>;
-
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import AppLogo from '../components/AppLogo';
-import WatchListIcon from '../assets/icons/WatchListIcon';
 import WatchListIconSmall from '../assets/icons/WatchListIconSmall';
+import UserScoreCircle from '../components/UserScoreCircle';
+import { HomeStackParamList, WatchlistStackParamList } from '../navigation/types';
+
+type DetailsScreenRouteProp = RouteProp<HomeStackParamList | WatchlistStackParamList, 'Details'>;
 
 type DetailsScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+  HomeStackParamList | WatchlistStackParamList,
   'Details'
 >;
 
@@ -141,11 +140,7 @@ const DetailsScreen = () => {
           {/* Score & Crew */}
           <View style={styles.statsSection}>
             <View style={styles.scoreContainer}>
-              <View style={styles.scoreCircle}>
-                <Text style={styles.scoreText}>
-                  {Math.round(movie.vote_average * 10)}%
-                </Text>
-              </View>
+              <UserScoreCircle score={Math.round(movie.vote_average * 10)} size={60} strokeWidth={4} />
               <Text style={styles.scoreLabel}>User Score</Text>
             </View>
 
@@ -156,8 +151,8 @@ const DetailsScreen = () => {
                   <Text style={styles.crewJob}>Director</Text>
                 </View>
               )}
-              {writers.map(w => (
-                <View key={w.id} style={styles.crewItem}>
+              {writers.map((w, index) => (
+                <View key={w.id + index} style={styles.crewItem}>
                   <Text style={styles.crewName}>{w.name}</Text>
                   <Text style={styles.crewJob}>{w.job}</Text>
                 </View>
@@ -355,21 +350,7 @@ const styles = StyleSheet.create({
     marginRight: 30,
     width: '45%',
   },
-  scoreCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 999,
-    backgroundColor: '#081c22',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    borderColor: '#21d07a',
-  },
-  scoreText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
+
   scoreLabel: {
     color: 'white',
     fontWeight: 'bold',

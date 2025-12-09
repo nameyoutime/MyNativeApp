@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export type MovieCategory = 'now_playing' | 'upcoming' | 'popular';
-export type SortOption = 'alphabetical' | 'rating' | 'release_date';
+export type SortOption = 'alphabetical' | 'rating' | 'release_date' | null;
 
 interface SettingsState {
   category: MovieCategory;
@@ -10,7 +10,7 @@ interface SettingsState {
 
 const initialState: SettingsState = {
   category: 'now_playing',
-  sortBy: 'release_date',
+  sortBy: null,
 };
 
 const settingsSlice = createSlice({

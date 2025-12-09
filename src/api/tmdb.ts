@@ -46,7 +46,6 @@ export const fetchMovies = async (
         endpoint = 'popular';
         break;
     }
-    console.log('Fetching movies from endpoint:', endpoint);
     const response = await api.get<MovieResponse>(`/movie/${endpoint}`, {
       params: {
         page,

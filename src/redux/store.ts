@@ -3,16 +3,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persistStore, persistReducer } from 'redux-persist';
 import userReducer from './slices/userSlice';
 import settingsReducer from './slices/settingsSlice';
+import watchlistReducer from './slices/watchlistSlice';
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['user', 'settings'], // Persist user and settings slices
+  whitelist: ['user', 'settings', 'watchlist'], // Persist user, settings, and watchlist
 };
 
 const rootReducer = combineReducers({
   user: userReducer,
   settings: settingsReducer,
+  watchlist: watchlistReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -411,7 +411,6 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    backgroundColor: '#f5f5f5', // Slightly darker list bg
   },
   listContent: {
     padding: 20,

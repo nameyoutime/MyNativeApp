@@ -67,7 +67,7 @@ export const AppNavigator = () => {
       <Stack.Screen
         name="Details"
         component={DetailsScreen}
-        options={{ title: 'Movie Details' }} // Or dynamic title
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

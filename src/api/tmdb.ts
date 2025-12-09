@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { ENV } from '../config/env';
-import { MovieResponse } from '../types/movie';
+import { MovieResponse, MovieDetails } from '../types/movie';
 import { MovieCategory } from '../redux/slices/settingsSlice';
 
 const api = axios.create({
@@ -57,6 +57,10 @@ export const fetchMovies = async (
 };
 
 export const fetchMovieDetails = async (id: number) => {
-  const response = await api.get(`/movie/${id}`);
+  const response = await api.get<MovieDetails>(`/movie/${id}`, {
+    params: {
+      append_to_response: 'credits,recommendations,release_dates',
+    },
+  });
   return response.data;
 };

@@ -15,17 +15,20 @@ import { ReduxProvider } from './src/redux/ReduxProvider';
 import { useAppSelector, useAppDispatch } from './src/redux/hooks';
 import { login, logout } from './src/redux/slices/userSlice';
 import { ENV } from './src/config/env';
+import { QueryProvider } from './src/api/QueryProvider';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
-    <ReduxProvider>
-      <SafeAreaProvider>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <AppContent />
-      </SafeAreaProvider>
-    </ReduxProvider>
+    <QueryProvider>
+      <ReduxProvider>
+        <SafeAreaProvider>
+          <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+          <AppContent />
+        </SafeAreaProvider>
+      </ReduxProvider>
+    </QueryProvider>
   );
 }
 
@@ -45,7 +48,7 @@ function AppContent() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Redux Slice with Local Storage</Text>
-      <Text style={styles.info}>API Key: {ENV.API_KEY}</Text>
+      <Text style={styles.info}>API Key: {ENV.TMDB_API_KEY}</Text>
       <Text style={styles.info}>
         Authenticated: {user.isAuthenticated ? 'Yes' : 'No'}
       </Text>

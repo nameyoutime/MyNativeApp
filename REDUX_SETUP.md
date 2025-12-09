@@ -29,7 +29,7 @@ src/
 ## Environment Configuration
 
 The app includes environment configuration with:
-- `API_KEY = 'test'`
+- `TMDB_API_KEY = 'test'`
 
 Access via `import { ENV } from './src/config/env'`
 
@@ -83,7 +83,7 @@ function MyComponent() {
 ```tsx
 import { ENV } from './src/config/env';
 
-console.log(ENV.API_KEY); // 'test'
+console.log(ENV.TMDB_API_KEY); // 'test'
 ```
 
 ## Local Storage Persistence

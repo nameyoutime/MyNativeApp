@@ -57,7 +57,6 @@ export const detailsStyles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   certBadge: {
-    height: 26,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,

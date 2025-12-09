@@ -81,7 +81,7 @@ const MainTabs = () => {
           backgroundColor: '#042541',
           borderTopColor: '#e0e0e0',
           height: Platform.OS === 'ios' ? 60 : 60,
-          // paddingBottom: Platform.OS === 'ios' ? 30 : 10,
+          paddingBottom: Platform.OS === 'ios' ? 30 : 10,
           paddingTop: 10,
         },
         // remove label text

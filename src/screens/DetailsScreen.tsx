@@ -19,14 +19,20 @@ import {
 } from '../redux/slices/watchlistSlice';
 import ChevronLeftIcon from '../assets/icons/ChevronLeftIcon';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Movie } from '../types/movie';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import AppLogo from '../components/AppLogo';
 import WatchListIconSmall from '../assets/icons/WatchListIconSmall';
 import UserScoreCircle from '../components/UserScoreCircle';
-import { HomeStackParamList, WatchlistStackParamList } from '../navigation/types';
+import {
+  HomeStackParamList,
+  WatchlistStackParamList,
+} from '../navigation/types';
+import { responsiveFontSize } from '../utils/responsive';
 
-type DetailsScreenRouteProp = RouteProp<HomeStackParamList | WatchlistStackParamList, 'Details'>;
+type DetailsScreenRouteProp = RouteProp<
+  HomeStackParamList | WatchlistStackParamList,
+  'Details'
+>;
 
 type DetailsScreenNavigationProp = NativeStackNavigationProp<
   HomeStackParamList | WatchlistStackParamList,
@@ -140,7 +146,11 @@ const DetailsScreen = () => {
           {/* Score & Crew */}
           <View style={styles.statsSection}>
             <View style={styles.scoreContainer}>
-              <UserScoreCircle score={Math.round(movie.vote_average * 10)} size={60} strokeWidth={4} />
+              <UserScoreCircle
+                score={Math.round(movie.vote_average * 10)}
+                size={60}
+                strokeWidth={4}
+              />
               <Text style={styles.scoreLabel}>User Score</Text>
             </View>
 
@@ -282,7 +292,7 @@ const styles = StyleSheet.create({
   navTitle: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: responsiveFontSize(18),
   },
   mainInfo: {
     flexDirection: 'row',
@@ -300,7 +310,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: 'white',
-    fontSize: 24,
+    fontSize: responsiveFontSize(24),
     fontWeight: 'bold',
     marginBottom: 5,
   },
@@ -323,16 +333,16 @@ const styles = StyleSheet.create({
   },
   certText: {
     color: 'rgba(255,255,255,0.7)',
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
   },
   metaText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
   },
   statusRow: {
     flexDirection: 'row',
     marginTop: 2,
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
   },
   statusLabel: {
     color: 'white',
@@ -344,7 +354,7 @@ const styles = StyleSheet.create({
   statsSection: {
     flexDirection: 'row',
     paddingHorizontal: 20,
-    marginTop: 10,
+    marginTop: 34,
   },
   scoreContainer: {
     marginRight: 30,
@@ -354,7 +364,7 @@ const styles = StyleSheet.create({
   scoreLabel: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: responsiveFontSize(18),
     marginTop: 4,
   },
   crewContainer: {
@@ -369,11 +379,11 @@ const styles = StyleSheet.create({
   crewName: {
     color: 'white',
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
   },
   crewJob: {
     color: 'rgba(255,255,255,0.7)',
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
   },
   overviewSection: {
     paddingHorizontal: 20,
@@ -383,17 +393,17 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontStyle: 'italic',
     marginBottom: 10,
-    fontSize: 20,
+    fontSize: responsiveFontSize(20),
   },
   overviewTitle: {
     color: 'white',
-    fontSize: 24,
+    fontSize: responsiveFontSize(24),
     fontWeight: 'bold',
     marginBottom: 8,
   },
   overviewText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
     lineHeight: 22,
   },
   buttonContainer: {
@@ -417,13 +427,13 @@ const styles = StyleSheet.create({
   watchlistButtonText: {
     color: 'white',
     fontWeight: '600',
-    fontSize: 18,
+    fontSize: responsiveFontSize(18),
   },
   sectionContainer: {
     marginTop: 25,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: responsiveFontSize(22),
     fontWeight: '600',
     color: 'black',
     marginLeft: 20,
@@ -456,11 +466,11 @@ const styles = StyleSheet.create({
   },
   castName: {
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: responsiveFontSize(14),
     color: 'black',
   },
   castRole: {
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
     color: '#666',
   },
   recContainer: {
@@ -488,12 +498,12 @@ const styles = StyleSheet.create({
   },
   recTitle: {
     flex: 1,
-    fontSize: 18,
+    fontSize: responsiveFontSize(18),
     color: 'black',
   },
   recRating: {
     marginLeft: 10,
-    fontSize: 18,
+    fontSize: responsiveFontSize(18),
   },
 });
 

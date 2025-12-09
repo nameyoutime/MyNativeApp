@@ -37,6 +37,7 @@ import AppLogo from '../components/AppLogo';
 import ChevronRightIcon from '../assets/icons/ChevronRightIcon';
 import ChevronDownIcon from '../assets/icons/ChevronDownIcon';
 import { HomeStackParamList } from '../navigation/types';
+import { responsiveFontSize } from '../utils/responsive';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   HomeStackParamList,
@@ -376,13 +377,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   dropdownLabel: {
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
     // semibold
     fontWeight: '600',
     color: '#000000',
   },
   chevron: {
-    fontSize: 12,
+    fontSize: responsiveFontSize(12),
     color: '#333',
   },
   dropdownList: {
@@ -405,7 +406,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#00B4E4',
   },
   dropdownItemText: {
-    fontSize: 14,
+    fontSize: responsiveFontSize(14),
     color: '#000000',
   },
   dropdownItemTextActive: {
@@ -419,7 +420,7 @@ const styles = StyleSheet.create({
     borderColor: '#E3E3E3',
     borderRadius: 5,
     padding: 12,
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
     marginBottom: 16,
     fontWeight: '600',
     color: '#999999',
@@ -439,7 +440,7 @@ const styles = StyleSheet.create({
   searchButtonText: {
     color: '#666',
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
   },
   listContainer: {
     flex: 1,
@@ -473,18 +474,18 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   movieTitle: {
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 4,
   },
   movieDate: {
-    fontSize: 12,
+    fontSize: responsiveFontSize(12),
     color: '#999',
     marginBottom: 12,
   },
   movieOverview: {
-    fontSize: 13,
+    fontSize: responsiveFontSize(13),
     color: '#333',
     lineHeight: 18,
   },
@@ -504,7 +505,7 @@ const styles = StyleSheet.create({
   loadMoreText: {
     color: '#FFFFFF',
     fontWeight: '600',
-    fontSize: 20,
+    fontSize: responsiveFontSize(20),
   },
 });
 

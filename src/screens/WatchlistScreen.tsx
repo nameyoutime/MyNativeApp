@@ -7,7 +7,6 @@ import {
   Image,
   TouchableOpacity,
   SafeAreaView,
-  StatusBar,
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -18,6 +17,8 @@ import { Movie } from '../types/movie';
 import { ENV } from '../config/env';
 import { fetchAccountDetails } from '../api/tmdb';
 import ChevronLeftIcon from '../assets/icons/ChevronLeftIcon';
+import { responsiveFontSize } from '../utils/responsive';
+import AppLogo from '../components/AppLogo';
 
 // Mock types since we might not get full account details cleanly without logic
 interface UserAccount {
@@ -58,7 +59,7 @@ const WatchlistScreen = () => {
   };
 
   const handlePressMovie = (movie: Movie) => {
-    navigation.navigate('Details', { movieId: movie.id });
+    navigation.navigate('Details', { movie: movie });
   };
 
   const sortedWatchlist = useMemo(() => {
@@ -109,7 +110,9 @@ const WatchlistScreen = () => {
         />
         <View style={styles.cardContent}>
           <View style={styles.cardHeader}>
-            <Text style={styles.movieTitle}>{item.title}</Text>
+            <Text style={styles.movieTitle} numberOfLines={2}>
+              {item.title}
+            </Text>
             <TouchableOpacity
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               onPress={() => handleRemove(item.id)}
@@ -118,7 +121,7 @@ const WatchlistScreen = () => {
             </TouchableOpacity>
           </View>
           <Text style={styles.releaseDate}>{formattedDate}</Text>
-          <Text style={styles.overview} numberOfLines={3}>
+          <Text style={styles.overview} numberOfLines={2}>
             {item.overview}
           </Text>
         </View>
@@ -128,8 +131,7 @@ const WatchlistScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#042541" />
-
+      <AppLogo />
       {/* Header Section */}
       <View style={styles.headerContainer}>
         <View style={styles.navBar}>
@@ -233,18 +235,18 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     color: '#fff',
-    fontSize: 36,
+    fontSize: responsiveFontSize(36),
     fontWeight: 'bold',
   },
   username: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: responsiveFontSize(20),
     fontWeight: 'bold',
   },
   joinedDate: {
     // white but 70% opacity
     color: 'rgba(255, 255, 255, 0.7)',
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
   },
   body: {
     flex: 1,
@@ -253,7 +255,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   screenTitle: {
-    fontSize: 18,
+    fontSize: responsiveFontSize(18),
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 15,
@@ -265,12 +267,12 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   filterLabel: {
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
     color: '#828282',
     marginRight: 10,
   },
   orderLabel: {
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
     color: '#828282',
     marginLeft: 20,
     marginRight: 5,
@@ -282,17 +284,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
   },
   placeholderStyle: {
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
     color: '#01b4e4',
     fontWeight: '600',
   },
   selectedTextStyle: {
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
     color: '#01b4e4',
     fontWeight: '600',
   },
   arrowIcon: {
-    fontSize: 20,
+    fontSize: responsiveFontSize(20),
     color: '#000',
     fontWeight: 'bold',
   },
@@ -315,11 +317,12 @@ const styles = StyleSheet.create({
   },
   poster: {
     width: 100,
-    height: 150,
+    height: 146,
   },
   cardContent: {
     flex: 1,
-    padding: 12,
+    paddingVertical: 21,
+    paddingHorizontal: 12,
     justifyContent: 'flex-start',
   },
   cardHeader: {
@@ -328,32 +331,33 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   movieTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: responsiveFontSize(16),
+    fontWeight: '600',
     color: '#000',
     flex: 1,
     marginRight: 10,
   },
   closeButton: {
-    fontSize: 24,
+    fontSize: responsiveFontSize(24),
     color: '#666',
     lineHeight: 24,
     marginTop: -5,
   },
   releaseDate: {
-    fontSize: 14,
+    fontSize: responsiveFontSize(14),
     color: '#999',
     marginBottom: 8,
   },
   overview: {
-    fontSize: 14,
+    fontSize: responsiveFontSize(14),
     color: '#333',
     lineHeight: 20,
+    marginTop: 17,
   },
   emptyText: {
     textAlign: 'center',
     marginTop: 50,
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
     color: '#666',
   },
 });

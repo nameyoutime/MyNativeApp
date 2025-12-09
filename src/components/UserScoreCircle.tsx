@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
+import { responsiveFontSize } from '../utils/responsive';
 
 interface UserScoreCircleProps {
   score: number; // 0 to 100
@@ -29,20 +30,15 @@ const UserScoreCircle: React.FC<UserScoreCircleProps> = ({
     barColor = '#d2d531'; // Yellow
     trackColor = '#423d0f'; // Dark Yellow
   }
-  
+
   // If score is 0, we might want grey? But let's stick to these for now.
 
   return (
     <View style={[styles.container, { width: size, height: size }]}>
       <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         {/* Background Circle Fill */}
-        <Circle
-          cx={size / 2}
-          cy={size / 2}
-          r={size / 2}
-          fill="#081c22"
-        />
-        
+        <Circle cx={size / 2} cy={size / 2} r={size / 2} fill="#081c22" />
+
         {/* Track Circle */}
         <G rotation="-90" origin={`${size / 2}, ${size / 2}`}>
           <Circle
@@ -67,21 +63,38 @@ const UserScoreCircle: React.FC<UserScoreCircleProps> = ({
           />
         </G>
       </Svg>
-      
+
       {/* Percentage Text Overlay */}
       <View style={StyleSheet.absoluteFillObject}>
         <View style={styles.textContainer}>
           {score > 0 ? (
             <View style={styles.scoreRow}>
-              <Text style={[styles.scoreText, { fontSize: size * 0.34 }]}>
+              <Text
+                style={[
+                  styles.scoreText,
+                  { fontSize: responsiveFontSize(size * 0.34) },
+                ]}
+              >
                 {score}
               </Text>
-              <Text style={[styles.percentText, { fontSize: size * 0.18 }]}>
+              <Text
+                style={[
+                  styles.percentText,
+                  { fontSize: responsiveFontSize(size * 0.18) },
+                ]}
+              >
                 %
               </Text>
             </View>
           ) : (
-            <Text style={[styles.scoreText, { fontSize: size * 0.34 }]}>NR</Text>
+            <Text
+              style={[
+                styles.scoreText,
+                { fontSize: responsiveFontSize(size * 0.34) },
+              ]}
+            >
+              NR
+            </Text>
           )}
         </View>
       </View>

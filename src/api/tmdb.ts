@@ -63,3 +63,15 @@ export const fetchMovieDetails = async (id: number) => {
   });
   return response.data;
 };
+
+export const fetchAccountDetails = async () => {
+  // Using the session_id or just the token if V4/V3 allows. 
+  // For V3 with Bearer token, /account usually returns the account details for the owner of the token.
+  try {
+    const response = await api.get('/account');
+    return response.data;
+  } catch (error) {
+    console.warn('Failed to fetch account details', error);
+    return null;
+  }
+};

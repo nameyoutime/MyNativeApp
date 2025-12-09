@@ -5,7 +5,7 @@ import { RootStackParamList, MainTabParamList } from './types';
 import HomeScreen from '../screens/HomeScreen';
 import WatchlistScreen from '../screens/WatchlistScreen';
 import DetailsScreen from '../screens/DetailsScreen';
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
 import HomeIcon from '../assets/icons/HomeIcon';
 import WatchListIcon from '../assets/icons/WatchListIcon';
 
@@ -80,6 +80,9 @@ const MainTabs = () => {
         tabBarStyle: {
           backgroundColor: '#042541',
           borderTopColor: '#e0e0e0',
+          height: Platform.OS === 'ios' ? 60 : 60,
+          // paddingBottom: Platform.OS === 'ios' ? 30 : 10,
+          paddingTop: 10,
         },
         // remove label text
         tabBarLabel: () => {
@@ -93,7 +96,7 @@ const MainTabs = () => {
               return <WatchListIcon />;
             }
           };
-          return <View style={{marginTop: 18}}>{render()}</View>;
+          return <View>{render()}</View>;
         },
       })}
     >

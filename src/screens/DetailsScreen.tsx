@@ -29,6 +29,7 @@ import {
   HomeStackParamList,
   WatchlistStackParamList,
 } from '../navigation/types';
+import { ENV } from '../config/env';
 
 type DetailsScreenRouteProp = RouteProp<
   HomeStackParamList | WatchlistStackParamList,
@@ -124,7 +125,7 @@ const DetailsScreen = () => {
             <View style={styles.mainInfo}>
               <Image
                 source={{
-                  uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+                  uri: `${ENV.TMDB_IMAGE_BASE_URL}w500${movie.poster_path}`,
                 }}
                 style={styles.poster}
                 resizeMode="cover"

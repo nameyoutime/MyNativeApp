@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, FlatList, StyleSheet } from 'react-native';
 import { responsiveFontSize } from '../utils/responsive';
+import { ENV } from '../config/env';
 
 interface CastListProps {
   cast: any[];
@@ -22,7 +23,7 @@ const CastList = ({ cast }: CastListProps) => {
             <Image
               source={{
                 uri: item.profile_path
-                  ? `https://image.tmdb.org/t/p/w200${item.profile_path}`
+                  ? `${ENV.TMDB_IMAGE_BASE_URL}w200${item.profile_path}`
                   : 'https://placehold.co/100x150/png',
               }}
               style={styles.castImage}
@@ -41,7 +42,7 @@ const CastList = ({ cast }: CastListProps) => {
 
 const styles = StyleSheet.create({
   sectionContainer: {
-    marginTop: 25,
+    marginVertical: 25,
   },
   sectionTitle: {
     fontSize: responsiveFontSize(22),

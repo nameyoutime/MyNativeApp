@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { responsiveFontSize } from '../utils/responsive';
 import { Movie } from '../types/movie';
+import { ENV } from '../config/env';
 
 interface RecommendationListProps {
   recommendations: Movie[];
@@ -26,7 +27,7 @@ const RecommendationList = ({ recommendations, onPress }: RecommendationListProp
           >
             <Image
               source={{
-                uri: `https://image.tmdb.org/t/p/w300${
+                uri: `${ENV.TMDB_IMAGE_BASE_URL}w300${
                   item.backdrop_path || item.poster_path
                 }`,
               }}
@@ -53,7 +54,7 @@ const RecommendationList = ({ recommendations, onPress }: RecommendationListProp
 
 const styles = StyleSheet.create({
   recContainer: {
-    marginTop: 35,
+    marginTop: 15,
     borderTopWidth: 1,
     paddingTop: 25,
     borderColor: '#E4E4E4',
@@ -68,7 +69,6 @@ const styles = StyleSheet.create({
   recCard: {
     width: 280,
     marginRight: 15,
-    marginBottom: 10,
   },
   recImage: {
     width: '100%',

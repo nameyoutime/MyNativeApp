@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Movie } from '../../types/movie';
 import { responsiveFontSize } from '../../utils/responsive';
+import { ENV } from '../../config/env';
 
 interface MovieCardProps {
   movie: Movie;
@@ -16,7 +17,7 @@ const MovieCard = ({ movie, onPress }: MovieCardProps) => {
       activeOpacity={0.7}
     >
       <Image
-        source={{ uri: `https://image.tmdb.org/t/p/w200${movie.poster_path}` }}
+        source={{ uri: `${ENV.TMDB_IMAGE_BASE_URL}w200${movie.poster_path}` }}
         style={styles.poster}
         borderRadius={4}
       />

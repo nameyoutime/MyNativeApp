@@ -5,13 +5,11 @@ import { MovieCategory } from '../redux/slices/settingsSlice';
 
 const api = axios.create({
   baseURL: ENV.TMDB_BASE_URL,
-  headers: {
-    Authorization: `Bearer ${ENV.TMDB_ACCESS_TOKEN}`,
-    accept: 'application/json',
-  },
   params: {
+    api_key: ENV.TMDB_ACCESS_TOKEN,
     language: 'en-US',
   },
+
 });
 
 export const fetchMovies = async (
